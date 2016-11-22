@@ -4,6 +4,7 @@
 # directories containing RPMs.
 
 progName=$0
+osName=rhel7
 
 Usage() {
     cat 1>&2 <<EOF
@@ -12,6 +13,7 @@ Usage:
 
 OPTIONS are:
     --directory, -d DIR  Get RPMs from under DIR
+    --os, -o OSNAME      Install on OSNAME
     --yum, -y YDIR       Use YDIR as the directory of yum repo files
     --create, -c         Use createrepo to regenerate
 EOF
@@ -34,6 +36,9 @@ do
 		--dir|--directory|-d)
 		    state=GET_DIR
 		    ;;
+                --os|-o)
+		    state=GET_OS
+		    ;;
 		--yum|-y)
 		    state=GET_YUM
 		    ;;
@@ -54,6 +59,10 @@ do
 	    ;;
 	GET_DIR)
 	    rpmDir="$a"
+	    state=OPT
+	    ;;
+	GET_OS)
+	    osName="$a"
 	    state=OPT
 	    ;;
 	GET_YUM)
@@ -91,7 +100,8 @@ EOF
 for D in "$rpmDir"/*_rpms ; do
     if [ -d "$D" ]; then
 	e=$(expr $(basename $D) : '\(.*\)_rpms')
-	cat >> $YR <<EOF
+	if ls "$D/"*.rpm > /dev/null 2>&1; then
+	    cat >> $YR <<EOF
 
 [spectrum_scale_$e]
 name=spectrum_scale_$e
@@ -99,5 +109,16 @@ baseurl=file://$D
 enable=1
 gpgcheck=0
 EOF
+	fi
+        if [ -d "$D/$osName" ]; then
+	cat >> $YR <<EOF
+
+[spectrum_scale_${e}_$osName]
+name=spectrum_scale_$e_$osName
+baseurl=file://$D/$osName
+enable=1
+gpgcheck=0
+EOF
+	fi
     fi
 done
