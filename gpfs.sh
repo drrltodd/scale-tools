@@ -17,4 +17,4 @@ for pathVar in /usr/lpp/mmfs/bin /opt/ibm/MCStore/bin; do
 	;;
     esac
 done
-
+unset pathVar
