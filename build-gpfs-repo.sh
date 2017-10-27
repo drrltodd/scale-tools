@@ -106,7 +106,7 @@ for D in "$rpmDir"/*_rpms ; do
 [spectrum_scale_$e]
 name=spectrum_scale_$e
 baseurl=file://$D
-enable=1
+enabled=1
 gpgcheck=0
 EOF
 	fi
@@ -116,7 +116,7 @@ EOF
 [spectrum_scale_${e}_$osName]
 name=spectrum_scale_$e_$osName
 baseurl=file://$D/$osName
-enable=1
+enabled=1
 gpgcheck=0
 EOF
 	fi
