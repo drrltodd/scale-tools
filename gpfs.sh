@@ -1,20 +1,18 @@
 #! /bin/sh
 
-for pathVar in /usr/lpp/mmfs/bin /opt/ibm/MCStore/bin; do
-    if [ ! -d $pathVar ]; then
-         continue
+# General Scale commands
+if echo $PATH | egrep -q '^(.*:)?(/i)*/usr/lpp/mmfs/bin(/)*(:.*)?$' ; then
+        : skip
+else
+        PATH=/usr/lpp/mmfs/bin:$PATH
+fi
+#
+# Cloud gateway
+if [ -d /opt/ibm/MCStore/bin ]; then
+    if echo $PATH | egrep -q '^(.*:)?(/i)*/opt/ibm/MCStore/bin(/)*(:.*)?$' ; then
+            : skip
+    else
+            PATH=/opt/ibm/MCStore/bin:$PATH
     fi
-
-    case $PATH in
-    *:$pathVar)
-	;;
-    *:$pathVar:*)
-	;;
-    $pathVar:*)
-	;;
-    *)
-	PATH=$pathVar:$PATH
-	;;
-    esac
-done
-unset pathVar
+fi
+export PATH
