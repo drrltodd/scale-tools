@@ -13,14 +13,16 @@ Usage:
 
 OPTIONS are:
     --directory, -d DIR  Get RPMs from under DIR
-    --os, -o OSNAME      Install on OSNAME
     --yum, -y YDIR       Use YDIR as the directory of yum repo files
+    --os, -o OSNAME      Install on OSNAME
+    --object, -O         Include object RPMs
     --create, -c         Use createrepo to regenerate
 EOF
 }
 
 rpmDir=.
 yumDir=/etc/yum.repos.d
+objFlag=
 crFlag=
 
 state=OPT
@@ -36,12 +38,15 @@ do
 		--dir|--directory|-d)
 		    state=GET_DIR
 		    ;;
-                --os|-o)
-		    state=GET_OS
-		    ;;
 		--yum|-y)
 		    state=GET_YUM
 		    ;;
+        --os|-o)
+		    state=GET_OS
+		    ;;
+		--object|-O)
+            objFlag=y
+            ;;
 		--create|-c)
 		    crFlag=y
 		    ;;
@@ -100,6 +105,11 @@ EOF
 for D in "$rpmDir"/*_rpms ; do
     if [ -d "$D" ]; then
 	e=$(expr $(basename $D) : '\(.*\)_rpms')
+	case $e in
+		obj*)
+			[ -z "$objFlag" ] && continue
+			;;
+	esac
 	if ls "$D/"*.rpm > /dev/null 2>&1; then
 	    cat >> $YR <<EOF
 
