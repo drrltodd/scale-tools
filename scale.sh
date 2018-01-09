@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# This should live in /etc/profile.d/
+
 # General Scale commands
 if echo $PATH | egrep -q '^(.*:)?(/i)*/usr/lpp/mmfs/bin(/)*(:.*)?$' ; then
         : skip
