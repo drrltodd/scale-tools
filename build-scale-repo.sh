@@ -1,5 +1,7 @@
 #! /bin/sh
 #
+# This file is provided as-is with no warranty.  Use at your own risk.
+#
 # Build a Spectrum Scale yum repository file, given a directory of
 # directories containing RPMs.
 
