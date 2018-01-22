@@ -92,11 +92,17 @@ GET_YUM)
 	;;
 esac
 
-# Start the repository.
+# Validate directory arguments.
+if [ ! -d "$rpmDir" ]; then
+	echo "$progName: Missing rpm directory \"$rpmDir\"" 1>&2
+	exit 1
+fi
 if [ ! -d "$yumDir" ]; then
     echo "$progName: Missing yum repo directory \"$yumDir\"" 1>&2
     exit 1
 fi
+
+# Start the repository.
 YR=$yumDir/spectrum_scale.repo
 cat > "$YR" <<EOF
 # Yum repository for IBM Spectrum Scale
