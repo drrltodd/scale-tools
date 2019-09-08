@@ -18,6 +18,7 @@ OPTIONS are:
     --yum, -y YDIR       Use YDIR as the directory of yum repo files
     --os, -o OSNAME      Install on OSNAME
     --object, -O         Include object RPMs
+    --hdfs, -H VER       Include HDFS transparency for verion VER
     --create, -c         Use createrepo to regenerate
 EOF
 }
@@ -25,6 +26,7 @@ EOF
 rpmDir=.
 yumDir=/etc/yum.repos.d
 objFlag=
+hdfsVer=
 crFlag=
 
 state=OPT
@@ -43,12 +45,15 @@ do
 		--yum|-y)
 		    state=GET_YUM
 		    ;;
-        --os|-o)
+		--os|-o)
 		    state=GET_OS
 		    ;;
 		--object|-O)
-            objFlag=y
-            ;;
+		    objFlag=y
+		    ;;
+		--hdfs|-H)
+		    state=GET_HDFS
+		    ;;
 		--create|-c)
 		    crFlag=y
 		    ;;
@@ -75,6 +80,10 @@ do
 	GET_YUM)
 	    yumDir="$a"
 	    state=OPT
+	    ;;
+	GET_HDFS)
+	    hdfsVer="$a"
+	    state="$a"
 	    ;;
     esac
 done
@@ -117,23 +126,30 @@ for D in "$rpmDir"/*_rpms ; do
 		obj*)
 			[ -z "$objFlag" ] && continue
 			;;
+		hdfs*)
+			[ -z "$hdfsVer" ] && continue
+			[ ! -d "$D/$osName/hdfs_${hdfsVer}.x" ] && continue
+			useDir="$D/$osName/hdfs_${hdfsVer}.x"
+			;;
+		*)
+			useDir=$D
 	esac
-	if ls "$D/"*.rpm > /dev/null 2>&1; then
+	if ls "$useDir/"*.rpm > /dev/null 2>&1; then
 	    cat >> $YR <<EOF
 
 [spectrum_scale_$e]
 name=spectrum_scale_$e
-baseurl=file://$D
+baseurl=file://$useDir
 enabled=1
 gpgcheck=0
 EOF
 	fi
-        if [ -d "$D/$osName" ]; then
+        if [ -d "$useDir/$osName" ]; then
 	cat >> $YR <<EOF
 
 [spectrum_scale_${e}_$osName]
 name=spectrum_scale_$e_$osName
-baseurl=file://$D/$osName
+baseurl=file://$useDir/$osName
 enabled=1
 gpgcheck=0
 EOF
